@@ -1,8 +1,9 @@
 """Tests for the melnor integration."""
+
 from __future__ import annotations
 
 from collections.abc import Generator
-from datetime import datetime, time, timedelta, timezone
+from datetime import UTC, datetime, time, timedelta
 from unittest.mock import AsyncMock, patch
 
 from melnor_bluetooth.device import Device
@@ -34,6 +35,7 @@ FAKE_SERVICE_INFO_1 = BluetoothServiceInfoBleak(
     advertisement=generate_advertisement_data(local_name=""),
     time=0,
     connectable=True,
+    tx_power=-127,
 )
 
 FAKE_SERVICE_INFO_2 = BluetoothServiceInfoBleak(
@@ -50,6 +52,7 @@ FAKE_SERVICE_INFO_2 = BluetoothServiceInfoBleak(
     advertisement=generate_advertisement_data(local_name=""),
     time=0,
     connectable=True,
+    tx_power=-127,
 )
 
 
@@ -73,7 +76,7 @@ class MockFrequency:
         self._interval = 0
         self._is_watering = False
         self._start_time = time(12, 0)
-        self._next_run_time = datetime(2021, 1, 1, 12, 0, tzinfo=timezone.utc)
+        self._next_run_time = datetime(2021, 1, 1, 12, 0, tzinfo=UTC)
 
     @property
     def duration_minutes(self) -> int:

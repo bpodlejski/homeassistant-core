@@ -1,4 +1,5 @@
 """Support for viewing the camera feed from a DoorBird video doorbell."""
+
 from __future__ import annotations
 
 import asyncio
@@ -87,7 +88,7 @@ class DoorBirdCamera(DoorBirdEntity, Camera):
         self._last_update = datetime.datetime.min
         self._attr_unique_id = f"{self._mac_addr}_{camera_id}"
 
-    async def stream_source(self):
+    async def stream_source(self) -> str | None:
         """Return the stream source."""
         return self._stream_url
 
@@ -106,9 +107,7 @@ class DoorBirdCamera(DoorBirdEntity, Camera):
                 response = await websession.get(self._url)
 
             self._last_image = await response.read()
-            self._last_update = now
-            return self._last_image
-        except asyncio.TimeoutError:
+        except TimeoutError:
             _LOGGER.error("DoorBird %s: Camera image timed out", self.name)
             return self._last_image
         except aiohttp.ClientError as error:
@@ -116,6 +115,9 @@ class DoorBirdCamera(DoorBirdEntity, Camera):
                 "DoorBird %s: Error getting camera image: %s", self.name, error
             )
             return self._last_image
+
+        self._last_update = now
+        return self._last_image
 
     async def async_added_to_hass(self) -> None:
         """Subscribe to events."""
@@ -128,5 +130,6 @@ class DoorBirdCamera(DoorBirdEntity, Camera):
         """Unsubscribe from events."""
         event_to_entity_id = self._door_bird_data.event_entity_ids
         for event in self._door_station.events:
-            del event_to_entity_id[event]
+            # If the clear api was called, the events may not be in the dict
+            event_to_entity_id.pop(event, None)
         await super().async_will_remove_from_hass()

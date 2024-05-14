@@ -1,4 +1,5 @@
 """Entity for the opengarage.io component."""
+
 from __future__ import annotations
 
 from homeassistant.core import callback
@@ -11,6 +12,8 @@ from . import DOMAIN, OpenGarageDataUpdateCoordinator
 
 class OpenGarageEntity(CoordinatorEntity[OpenGarageDataUpdateCoordinator]):
     """Representation of a OpenGarage entity."""
+
+    _attr_has_entity_name = True
 
     def __init__(
         self,
